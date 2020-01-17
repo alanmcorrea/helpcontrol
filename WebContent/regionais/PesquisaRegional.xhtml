@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml">
+
+	<ui:define name="titulo">Pesquisa regionais</ui:define>
+	
+	<ui:define name="corpo">
+	
+	    <f:metadata>
+	    	<f:viewParam name="regional_alt_id" value="#{pesquisaRegionalController.regional_alt_id}"/>
+<!--     		<f:event listener="#{pesquisaRegionalController.inicializar()}" type="preRenderView" /> -->
+    	</f:metadata>
+	
+		<h:form id="frmPesquisa">
+			<h1>Pesquisa regionais</h1>
+			
+			<p:messages autoUpdate="true" closable="true" />
+			
+			<p:toolbar style="margin-top: 20px">
+			
+				<p:toolbarGroup>
+				
+					<p:commandButton value="Pesquisar" action="#{pesquisaRegionalController.pesquisar()}"
+					update="@form"/>
+					
+				</p:toolbarGroup>
+				
+				<p:toolbarGroup align="right">
+				
+					<p:button value="Nova" outcome="/regionais/CadastroRegional"/>
+					
+				</p:toolbarGroup>
+			
+			</p:toolbar>
+			
+			<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		
+	    		<p:outputLabel value="Nome" for="nome"/>
+	    		<p:inputText id="nome" size="60" value="#{pesquisaRegionalController.filtro.nome}" />
+	    		
+	    	</p:panelGrid>
+			
+			<p:dataTable id="regionais-table" value="#{pesquisaRegionalController.regionaisFiltradas}" var="regional"
+			style="margin-top: 20px" emptyMessage="Nenhuma regional encontrada." rows="20" paginator="true" 
+			paginatorAlwaysVisible="false" paginatorPosition="bottom">
+				
+				<p:column style="text-align: center;" headerText="Nome" sortBy="#{regional.nome}">
+					<h:outputText value="#{regional.nome}" />
+				</p:column>
+				
+				<p:column style="text-align: center;" headerText="Descrição">
+					<h:outputText value="#{regional.descricao}" />
+				</p:column>
+
+				<p:column style="text-align: center; width: 100px">
+				
+					<p:button icon="ui-icon-pencil" title="Editar" outcome="/regionais/CadastroRegional" >
+					
+						<f:param name="regional" value="#{regional.id}"/>
+						
+					</p:button>
+					
+					<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="PF('confirmacaoExclusao').show()"
+					process="@this" update=":frmPesquisa:confirmacaoExclusaoDialog">
+						
+							<f:setPropertyActionListener value="#{regional}" target="#{pesquisaRegionalController.regionalSelecionada}" />
+							
+					</p:commandButton>
+				
+				</p:column>
+				
+			</p:dataTable>
+			
+			<p:confirmDialog header="Exclusão de regional" message="Tem certeza que deseja excluir a regional #{pesquisaRegionalController.regionalSelecionada.nome}?"
+			widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				
+				<p:button value="Não" onclick="PF('confirmacaoExclusao').hide(); return false;"/>
+				<p:commandButton value="Sim" oncomplete="PF('confirmacaoExclusao').hide()" action="#{pesquisaRegionalController.excluir()}"
+				process="@this" update="regionais-table"/>
+				
+			</p:confirmDialog>
+			
+		</h:form>
+	</ui:define>
+	
+</ui:composition>
+
+<h:head></h:head> 
+<body> 
+
+</body> 
+</html>

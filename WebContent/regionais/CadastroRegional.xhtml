@@ -1,0 +1,50 @@
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">#{cadastroRegionalController.editando ? 'Edição de Regionais' : 'Nova regional'}</ui:define>
+
+    <ui:define name="corpo">
+    
+    	<f:metadata>
+    		<f:viewParam name="regional" value="#{cadastroRegionalController.regional}" converter="#{regionalConverter}"/>
+    		<f:event listener="#{cadastroRegionalController.inicializar()}" type="preRenderView" />
+    	</f:metadata>
+    
+    	<h:form>
+    			
+	    	<H1>#{cadastroRegionalController.editando ? 'Edição de Regionais' : 'Nova regional'}</H1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    	
+	    		<p:toolbarGroup>
+	    			<p:button value="Nova" outcome="/regionais/CadastroRegional"/>
+	    			<p:commandButton value="Salvar" id="botaoSalvar"
+	    				onclick="this.disabled=true" oncomplete="this.disabled=false"
+	    				 action="#{cadastroRegionalController.salvar()}" update="@form"/>
+	    				 
+	    		</p:toolbarGroup>
+	    		
+	    		<p:toolbarGroup align="right">
+	    			<p:button value="Pesquisa" outcome="/regionais/PesquisaRegional"/>
+	    		</p:toolbarGroup>
+	    		
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		<p:outputLabel value="Nome" for="nome"/>
+	    		<p:inputText id="nome" size="20" maxlength="20" value="#{cadastroRegionalController.regional.nome}" />
+	    		
+	    		<p:outputLabel value="Descrição" for="descricao"/>
+	    		<p:inputText id="descricao" size="60" maxlength="80" value="#{cadastroRegionalController.regional.descricao}"/>
+	    		
+	    	</p:panelGrid>
+    	</h:form>
+    </ui:define>
+</ui:composition>

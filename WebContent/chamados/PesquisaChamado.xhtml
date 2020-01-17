@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml">
+
+	<ui:define name="titulo">Pesquisa chamados</ui:define>
+	
+	<ui:define name="corpo">
+	
+	    <f:metadata>
+    		<f:event listener="#{pesquisaChamadoController.inicializar()}" type="preRenderView" />
+    	</f:metadata>
+	
+		<h:form id="frmPesquisa">
+			<h1>Pesquisa chamados</h1>
+			
+			<p:messages autoUpdate="true" closable="true" />
+			
+			<p:toolbar id="toolbar" style="margin-top: 20px">
+
+				<p:toolbarGroup>
+
+					<p:commandButton value="Pesquisar"
+						action="#{pesquisaChamadoController.pesquisar()}" update="@form" />
+
+					<span class="ui-separator"> <span
+						class="ui-icon ui-icon-grip-dotted-vertical" />
+					</span>
+
+					<p:button icon="ui-icon-pencil" title="Editar" outcome="/chamados/CadastroChamado" 
+					disabled="#{pesquisaChamadoController.chamadoSelecionado == null}">
+					
+						<f:param name="chamado" value="#{pesquisaChamadoController.chamadoSelecionado.id}"/>
+						
+					</p:button>
+					
+					<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="PF('confirmacaoExclusao').show()"
+						process="@this" update=":frmPesquisa:confirmacaoExclusaoDialog"
+						disabled="#{pesquisaChamadoController.chamadoSelecionado == null}">
+						
+							<f:setPropertyActionListener value="#{pesquisaChamadoController.chamadoSelecionado}" target="#{pesquisaChamadoController.chamadoSelecionado}" />
+							
+					</p:commandButton>
+					
+					<p:commandButton value="Limpar"
+						action="#{pesquisaChamadoController.limpar}" process="" update="@form" />
+					
+					<p:commandButton value="xls" icon="ui-icon-arrowreturnthick-1-e" title="Exportar para XLS"
+                           ajax="false" immediate="true">
+                           
+                            <p:dataExporter type="xls" target="chamados-table" fileName="chamados"/>
+                            
+                    </p:commandButton>
+
+				</p:toolbarGroup>
+
+				<p:toolbarGroup align="right">
+				
+					<p:button value="Novo" outcome="/chamados/CadastroChamado"/>
+					
+				</p:toolbarGroup>
+			
+			</p:toolbar>
+			
+			<p:panelGrid columns="4" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo, rotulo, campo">
+	    		
+	    		<p:outputLabel value="Incidente" for="incidente"/>
+	    		<p:inputText id="incidente" size="15" value="#{pesquisaChamadoController.filtro.incidente}" />
+					
+				<p:outputLabel value="Analista"/>
+				<p:inputText size="20" value="#{pesquisaChamadoController.filtro.nomeUsuario}"/>	
+					
+				<p:outputLabel value="Data"/>
+				<h:panelGroup>
+					<p:calendar size="10" pattern="dd/MM/yyyy" value="#{pesquisaChamadoController.filtro.dataDe}"/>
+					a
+					<p:calendar size="10" pattern="dd/MM/yyyy" value="#{pesquisaChamadoController.filtro.dataAte}"/>
+				</h:panelGroup>
+				
+				<p:outputLabel value="Regional"/>
+	    		<p:selectOneMenu id="regional" value="#{pesquisaChamadoController.filtro.regional}" 
+	    		converter="#{regionalConverter}">
+	    			<f:selectItem itemLabel="Selecione a regional"/>
+	    			<f:selectItems value="#{pesquisaChamadoController.regionais}" var="regional"
+	    				itemValue="#{regional}" itemLabel="#{regional.nome}" />
+	    		</p:selectOneMenu>
+	
+				<p:outputLabel value="Status"/>
+				<p:selectManyCheckbox value="#{pesquisaChamadoController.filtro.statuses}">
+					<f:selectItems value="#{pesquisaChamadoController.statuses}" var="#{status}"
+					itemValue="#{status}" itemLabel="#{status.descricao}"/>
+				</p:selectManyCheckbox>
+				
+				<p:outputLabel value="Categoria"/>
+	    		<p:selectOneMenu id="categoria" value="#{pesquisaChamadoController.filtro.categoria}" 
+	    		converter="#{categoriaConverter}">
+	    			<f:selectItem itemLabel="Selecione acategoria"/>
+	    			<f:selectItems value="#{pesquisaChamadoController.categorias}" var="categoria"
+	    				itemValue="#{categoria}" itemLabel="#{categoria.nome}" />
+	    		</p:selectOneMenu>
+				
+				<p:outputLabel value="Equipe"/>
+	    		<p:selectOneMenu id="equipe" value="#{pesquisaChamadoController.filtro.equipe}" 
+	    		converter="#{equipeConverter}">
+	    			<f:selectItem itemLabel="Selecione a equipe"/>
+	    			<f:selectItems value="#{pesquisaChamadoController.equipes}" var="equipe"
+	    				itemValue="#{equipe}" itemLabel="#{equipe.nome}" />
+	    		</p:selectOneMenu>
+				
+				<p:outputLabel value="Produto"/>
+				<p:inputText size="20" value="#{pesquisaChamadoController.filtro.nomeProduto}"/>
+				
+				<p:outputLabel value="Atual. Procedimento"/>
+				<p:selectManyCheckbox value="#{pesquisaChamadoController.filtro.atualizacaoProcedimentos}">
+					<f:selectItems value="#{pesquisaChamadoController.atualizacaoProcedimentos}" var="#{atualizacaoProcedimento}"
+					itemValue="#{atualizacaoProcedimento}" itemLabel="#{atualizacaoProcedimento.descricao}"/>
+				</p:selectManyCheckbox>
+				
+				<p:outputLabel value="Procedimento"/>
+	    		<p:selectOneMenu id="procedimento" value="#{pesquisaChamadoController.filtro.procedimento}" 
+	    		converter="#{procedimentoConverter}">
+	    			<f:selectItem itemLabel="Selecione o procedimento"/>
+	    			<f:selectItems value="#{pesquisaChamadoController.procedimentos}" var="procedimento"
+	    				itemValue="#{procedimento}" itemLabel="#{procedimento.nome}" />
+	    		</p:selectOneMenu>
+	    		
+	    	</p:panelGrid>
+			
+			<p:dataTable id="chamados-table" value="#{pesquisaChamadoController.chamadosFiltrados}" var="chamado"
+			style="margin-top: 20px" emptyMessage="Nenhum chamado encontrado." rows="20" paginator="true" 
+			paginatorAlwaysVisible="false" paginatorPosition="bottom" selection="#{pesquisaChamadoController.chamadoSelecionado}"
+            selectionMode="single" rowKey="#{chamado.id}">
+				
+				<p:ajax event="rowSelect" update=":frmPesquisa:toolbar"/>
+                <p:ajax event="rowUnselect" update=":frmPesquisa:toolbar"/>
+				
+				<p:column style="text-align: center" headerText="Incidente" width="100" sortBy="#{chamado.id}">
+					<h:outputText value="#{chamado.incidente}" />
+				</p:column>
+				
+				<p:column style="text-align: center" headerText="Data" width="60" sortBy="#{chamado.data}">
+                    <h:outputText value="#{chamado.data}">
+                    	<f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: center" headerText="Regional" width="80" sortBy="#{chamado.regional.nome}">
+                    <h:outputText value="#{chamado.regional.nome}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Local" width="100" sortBy="#{chamado.local}">
+                    <h:outputText value="#{chamado.local}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Analista" width="80" sortBy="#{chamado.usuario.nome}">
+                    <h:outputText value="#{chamado.usuario.nome}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Categoria" width="150" sortBy="#{chamado.produto.categoria.nome}">
+                    <h:outputText value="#{chamado.produto.categoria.nome}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Produto" width="150" sortBy="#{chamado.produto.nome}">
+                    <h:outputText value="#{chamado.produto.nome}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Status" width="60" sortBy="#{chamado.status}">
+                    <h:outputText value="#{chamado.status}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Motivo do Repasse" width="260">
+                    <h:outputText value="#{chamado.motivoRepasse}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Resolução" width="260">
+                    <h:outputText value="#{chamado.resolucao}"/>
+                </p:column>
+                    
+                <p:column style="text-align: center" headerText="Atual. Proc." width="60" sortBy="#{chamado.atualizacaoProcedimento}">
+                    <h:outputText value="#{chamado.atualizacaoProcedimento}"/>
+                </p:column>
+                
+                 <p:column style="text-align: center" headerText="Procedimento" width="150" sortBy="#{chamado.procedimento.nome}">
+                    <h:outputText value="#{chamado.procedimento.nome}"/>
+                </p:column>
+                
+                <p:column style="text-align: center" headerText="Desc. Atualizacao" width="260">
+                    <h:outputText value="#{chamado.descricaoAtualizacaoProcedimento}"/>
+                </p:column>
+                
+                <p:column style="text-align: center" headerText="Equipe" width="160" sortBy="#{chamado.equipe.nome}">
+                    <h:outputText value="#{chamado.equipe.nome}"/>
+                </p:column>
+				
+			</p:dataTable>
+			
+			<p:confirmDialog header="Exclusão de chamado" message="Tem certeza que deseja excluir o chamado #{pesquisaChamadoController.chamadoSelecionado.incidente}?"
+			widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				
+				<p:button value="Não" onclick="PF('confirmacaoExclusao').hide(); return false;"/>
+				<p:commandButton value="Sim" oncomplete="PF('confirmacaoExclusao').hide()" action="#{pesquisaChamadoController.excluir()}"
+				process="@this" update="chamados-table"/>
+				
+			</p:confirmDialog>
+			
+		</h:form>
+	</ui:define>
+	
+</ui:composition>
+
+<h:head></h:head> 
+<body> 
+
+</body> 
+</html>

@@ -1,0 +1,61 @@
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <ui:define name="titulo">#{cadastroAdministradorController.editando ? 'Edição de Administradores' : 'Novo administrador'}</ui:define>
+
+    <ui:define name="corpo">
+    
+    	<f:metadata>
+    		<f:viewParam name="usuario" value="#{cadastroAdministradorController.usuario}" converter="#{usuarioConverter}"/>
+    		<f:event listener="#{cadastroAdministradorController.inicializar()}" type="preRenderView" />
+    	</f:metadata>
+    
+    	<h:form>
+    			
+	    	<H1>#{cadastroAdministradorController.editando ? 'Edição de Administradores' : 'Novo administrador'}</H1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    	
+	    		<p:toolbarGroup>
+	    			<p:button value="Novo" outcome="/administradores/CadastroAdministrador"/>
+	    			
+	    			<p:commandButton value="Salvar" id="botaoSalvar" rendered="#{!cadastroAdministradorController.usuario.administrador}"
+	    				 onclick="this.disabled=true" oncomplete="this.disabled=false"
+	    				 action="#{cadastroAdministradorController.salvar()}" update="@form"/>
+	    				 
+	    		</p:toolbarGroup>
+	    		
+	    		<p:toolbarGroup align="right">
+	    			<p:button value="Pesquisa" outcome="/administradores/PesquisaAdministrador"/>
+	    		</p:toolbarGroup>
+	    		
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    			
+	    		<p:outputLabel value="Chave" for="chave"/>
+	    		<p:inputText id="chave" size="4" maxlength="4" disabled="#{cadastroAdministradorController.usuario.administrador}"
+	    		value="#{cadastroAdministradorController.usuario.chave}"/>	
+	    			
+	    		<p:outputLabel value="Nome" for="nome"/>
+	    		<p:inputText id="nome" size="60" maxlength="80" disabled="#{cadastroAdministradorController.usuario.administrador}"
+	    		value="#{cadastroAdministradorController.usuario.nome}" />
+
+	    		<p:outputLabel value="Status" for="status"/>
+                <p:selectOneMenu id="status" disabled="#{cadastroAdministradorController.usuario.administrador}"
+                value="#{cadastroAdministradorController.usuario.status}">
+                            
+                     <f:selectItems value="#{cadastroAdministradorController.statuses}" var="status" 
+                                           itemLabel="#{status.descricao}" itemValue="#{status}"/>
+                </p:selectOneMenu>
+	    	</p:panelGrid>
+    	</h:form>
+    </ui:define>
+</ui:composition>

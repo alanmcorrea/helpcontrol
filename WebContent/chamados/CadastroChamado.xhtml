@@ -1,0 +1,144 @@
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">#{cadastroChamadoController.editando ? 'Edição de Chamados' : 'Novo chamado'}</ui:define>
+
+    <ui:define name="corpo">
+    
+    	<f:metadata>
+    		<f:viewParam name="chamado" value="#{cadastroChamadoController.chamado}" converter="#{chamadoConverter}"/>
+    		<f:event listener="#{cadastroChamadoController.inicializar()}" type="preRenderView" />
+    	</f:metadata>
+    
+    	<h:form>
+    			
+	    	<H1>#{cadastroChamadoController.editando ? 'Edição de Chamados' : 'Novo chamado'}</H1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    	
+	    		<p:toolbarGroup>
+	    			<p:button value="Novo" outcome="/chamados/CadastroChamado"/>
+	    			<p:commandButton value="Salvar" id="botaoSalvar"
+	    				onclick="this.disabled=true" oncomplete="this.disabled=false"
+	    				action="#{cadastroChamadoController.salvar()}" update="@form"/>
+	    				 
+	    		</p:toolbarGroup>
+	    		
+	    		<p:toolbarGroup align="right">
+	    			<p:button value="Pesquisa" outcome="/chamados/PesquisaChamado"/>
+	    		</p:toolbarGroup>
+	    		
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    			
+	    		<p:outputLabel value="Incidente" for="incidente"/>
+	    		<p:inputText id="incidente" size="15" maxlength="15" value="#{cadastroChamadoController.chamado.incidente}" />
+	    		
+	    		<p:outputLabel value="Data" for="data"/>
+                <p:calendar id="data" size="10" maxlength="10"
+                        value="#{cadastroChamadoController.chamado.data}"
+                        pattern="dd/MM/yyyy" mask="99/99/9999" locale="pt_BR"/>
+                    
+	    		
+	    		<p:outputLabel value="Regional" for="regional"/>
+	    		<p:selectOneMenu id="regional" value="#{cadastroChamadoController.chamado.regional}" 
+	    		converter="#{regionalConverter}">
+	    			<f:selectItem itemLabel="Selecione a regional"/>
+	    			<f:selectItems value="#{cadastroChamadoController.regionais}" var="regional"
+	    				itemValue="#{regional}" itemLabel="#{regional.nome}" />
+	    		</p:selectOneMenu>
+	    		
+	    		<p:outputLabel value="Local" for="local"/>
+	    		<p:inputText id="local" size="30" maxlength="50" value="#{cadastroChamadoController.chamado.local}" />
+	    		
+	    		<p:outputLabel value="Analista" for="analista"/>
+	    		<p:selectOneMenu id="analista" value="#{cadastroChamadoController.chamado.usuario}" 
+	    		converter="#{usuarioConverter}">
+	    			<f:selectItem itemLabel="Selecione o analista"/>
+	    			<f:selectItems value="#{cadastroChamadoController.usuarios}" var="usuario"
+	    				itemValue="#{usuario}" itemLabel="#{usuario.nome}" />
+	    				
+	    			<p:ajax listener="#{cadastroChamadoController.carregarEquipes}" update="equipe" />	
+	    				
+	    		</p:selectOneMenu>
+	    		
+	    		<p:outputLabel value="Categoria" for="categoria"/>
+	    		<p:selectOneMenu id="categoria" value="#{cadastroChamadoController.chamado.categoria}" converter="#{categoriaConverter}">
+	    		
+	    			<f:selectItem itemLabel="Selecione a categoria"/>
+	    			<f:selectItems value="#{cadastroChamadoController.categorias}" var="categoria"
+	    				itemValue="#{categoria}" itemLabel="#{categoria.nome}" />
+	    				
+	    			<p:ajax listener="#{cadastroChamadoController.carregarProdutos}" update="produto" />
+	    			
+	    		</p:selectOneMenu>
+	    		
+	    		<p:outputLabel value="Produto" for="produto"/>
+	    		<p:selectOneMenu id="produto" value="#{cadastroChamadoController.chamado.produto}" converter="#{produtoConverter}">
+	    		
+	    			<f:selectItem itemLabel="Selecione o produto"/>
+	    			<f:selectItems value="#{cadastroChamadoController.produtos}" var="produto"
+	    				itemValue="#{produto}" itemLabel="#{produto.nome}" />
+	    				
+	    		</p:selectOneMenu>
+	    		
+	    		<p:outputLabel value="Status" for="status"/>
+                <p:selectOneMenu id="status" value="#{cadastroChamadoController.chamado.status}">
+                      
+                     <f:selectItem itemLabel="Selecione o status"/>      
+                     <f:selectItems value="#{cadastroChamadoController.statuses}" var="status" 
+                                           itemLabel="#{status.descricao}" itemValue="#{status}"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Motivo do Repasse" for="motivo-repasse"/>
+                        <p:inputTextarea id="motivo-repasse"  maxlength="900" rows="2" cols="50"
+                        value="#{cadastroChamadoController.chamado.motivoRepasse}"/>
+                        
+                <p:outputLabel value="Resolução" for="resolucao"/>
+                        <p:inputTextarea id="resolucao"  maxlength="900" rows="2" cols="50"
+                        value="#{cadastroChamadoController.chamado.resolucao}"/>
+                        
+                <p:outputLabel value="Atualização de Procedimento" for="atualizacaoProcedimento"/>
+                <p:selectOneMenu id="atualizacaoProcedimento" value="#{cadastroChamadoController.chamado.atualizacaoProcedimento}">
+                            														  
+                             <f:selectItems value="#{cadastroChamadoController.atualizacaoProcedimentos}" var="atualizacaoProcedimento" 
+                                            itemLabel="#{atualizacaoProcedimento.descricao}" itemValue="#{atualizacaoProcedimento}"/>
+                                            
+                            <p:ajax listener="#{cadastroChamadoController.habilitarCampoDescAtualizacao()}" update="desc-atualizacao procedimento" />
+                             							  
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Procedimento" for="procedimento"/>
+	    		<p:selectOneMenu id="procedimento" value="#{cadastroChamadoController.chamado.procedimento}" 
+	    		converter="#{procedimentoConverter}" disabled="#{cadastroChamadoController.atualizacaoProcedimentoSim}">
+	    		
+					<f:selectItem itemLabel="Selecione o procedimento"/>
+	    			<f:selectItems value="#{cadastroChamadoController.procedimentos}" var="procedimento"
+	    				itemValue="#{procedimento}" itemLabel="#{procedimento.nome}" />
+	    					    			
+	    		</p:selectOneMenu>
+	    		
+	    		<p:outputLabel value="Desc. da Atualização" for="desc-atualizacao"/>
+                        <p:inputTextarea id="desc-atualizacao"  maxlength="900" rows="2" cols="50"
+                        value="#{cadastroChamadoController.chamado.descricaoAtualizacaoProcedimento}"
+                        disabled="#{cadastroChamadoController.atualizacaoProcedimentoSim}"/>
+                
+                <p:outputLabel value="Equipe" for="equipe"/>
+                <p:selectOneMenu id="equipe" value="#{cadastroChamadoController.chamado.equipe}" converter="#{equipeConverter}">
+                            														  
+                             <f:selectItems value="#{cadastroChamadoController.equipesAnalista}" var="equipe" 
+                                            itemLabel="#{equipe.nome}" itemValue="#{equipe}"/>
+                </p:selectOneMenu>
+	
+	    	</p:panelGrid>
+    	</h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml">
+
+	<ui:define name="titulo">Pesquisa procedimentos</ui:define>
+	
+	<ui:define name="corpo">
+	
+<!-- 	    <f:metadata> -->
+<!--     		<f:event listener="#{pesquisaProcedimentoController.inicializar()}" type="preRenderView" /> -->
+<!--     	</f:metadata> -->
+	
+		<h:form id="frmPesquisa">
+			<h1>Pesquisa procedimentos</h1>
+			
+			<p:messages autoUpdate="true" closable="true" />
+			
+			<p:toolbar style="margin-top: 20px">
+			
+				<p:toolbarGroup>
+				
+					<p:commandButton value="Pesquisar" action="#{pesquisaProcedimentoController.pesquisar()}"
+					update="@form"/>
+					
+				</p:toolbarGroup>
+				
+				<p:toolbarGroup align="right">
+				
+					<p:button value="Novo" outcome="/procedimentos/CadastroProcedimento"/>
+					
+				</p:toolbarGroup>
+			
+			</p:toolbar>
+			
+			<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		
+	    		<p:outputLabel value="Nome" for="nome"/>
+	    		<p:inputText id="nome" size="60" value="#{pesquisaProcedimentoController.filtro.nome}" />
+	    		
+	    	</p:panelGrid>
+			
+			<p:dataTable id="procedimentos-table" value="#{pesquisaProcedimentoController.procedimentosFiltrados}" var="procedimento"
+			style="margin-top: 20px" emptyMessage="Nenhum procedimento encontrado." rows="20" paginator="true" 
+			paginatorAlwaysVisible="false" paginatorPosition="bottom">
+				
+				<p:column style="text-align: center;" headerText="Nome" sortBy="#{procedimento.nome}">
+					<h:outputText value="#{procedimento.nome}" />
+				</p:column>
+				
+				<p:column style="text-align: center;" headerText="Descrição">
+					<h:outputText value="#{procedimento.descricao}" />
+				</p:column>
+
+				<p:column style="text-align: center; width: 100px">
+				
+					<p:button icon="ui-icon-pencil" title="Editar" outcome="/procedimentos/CadastroProcedimento">
+					
+						<f:param name="procedimento" value="#{procedimento.id}"/>
+						
+					</p:button>
+					
+					<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="PF('confirmacaoExclusao').show()"
+					process="@this" update=":frmPesquisa:confirmacaoExclusaoDialog">
+						
+							<f:setPropertyActionListener value="#{procedimento}" target="#{pesquisaProcedimentoController.procedimentoSelecionado}" />
+							
+					</p:commandButton>
+				
+				</p:column>
+				
+			</p:dataTable>
+			
+			<p:confirmDialog header="Exclusão de procedimento" message="Tem certeza que deseja excluir o procedimento #{pesquisaProcedimentoController.procedimentoSelecionado.nome}?"
+			widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				
+				<p:button value="Não" onclick="PF('confirmacaoExclusao').hide(); return false;"/>
+				<p:commandButton value="Sim" oncomplete="PF('confirmacaoExclusao').hide()" action="#{pesquisaProcedimentoController.excluir()}"
+				process="@this" update="procedimentos-table"/>
+				
+			</p:confirmDialog>
+			
+		</h:form>
+	</ui:define>
+	
+</ui:composition>
+
+<h:head></h:head> 
+<body> 
+
+</body> 
+</html>

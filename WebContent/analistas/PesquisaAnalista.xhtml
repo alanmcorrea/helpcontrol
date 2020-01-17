@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<ui:composition template="/WEB-INF/templates/LayoutPadrao.xhtml">
+
+	<ui:define name="titulo">Pesquisa analistas</ui:define>
+	
+	<ui:define name="corpo">
+	
+<!-- 	    <f:metadata> -->
+<!--     		<f:event listener="#{pesquisaAnalistaController.inicializar()}" type="preRenderView" /> -->
+<!--     	</f:metadata> -->
+	
+		<h:form id="frmPesquisa">
+			<h1>Pesquisa analistas</h1>
+			
+			<p:messages autoUpdate="true" closable="true" />
+			
+			<p:toolbar style="margin-top: 20px">
+			
+				<p:toolbarGroup>
+				
+					<p:commandButton value="Pesquisar" action="#{pesquisaAnalistaController.pesquisar()}"
+					update="@form"/>
+					
+				</p:toolbarGroup>
+				
+				<p:toolbarGroup align="right">
+				
+					<p:button value="Novo" outcome="/analistas/CadastroAnalista"/>
+					
+				</p:toolbarGroup>
+			
+			</p:toolbar>
+			
+			<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		
+	    		<p:outputLabel value="Nome" for="nome"/>
+	    		<p:inputText id="nome" size="60" value="#{pesquisaAnalistaController.filtro.nome}" />
+	    		
+	    		<p:outputLabel value="Status"/>
+				<p:selectManyCheckbox value="#{pesquisaAnalistaController.filtro.statuses}">
+					<f:selectItems value="#{pesquisaAnalistaController.statuses}" var="#{status}"
+					itemValue="#{status}" itemLabel="#{status.descricao}"/>
+				</p:selectManyCheckbox>
+	    		
+	    	</p:panelGrid>
+			
+			<p:dataTable id="analistas-table" value="#{pesquisaAnalistaController.usuariosFiltrados}" var="usuario"
+			style="margin-top: 20px" emptyMessage="Nenhum analista encontrado." rows="20" paginator="true" 
+			paginatorAlwaysVisible="false" paginatorPosition="bottom">
+				
+				<p:column style="text-align: center" headerText="Chave" width="100">
+					<h:outputText value="#{usuario.chave}" />
+				</p:column>
+				
+				<p:column style="text-align: center" headerText="Nome" sortBy="#{usuario.nome}">
+					<h:outputText value="#{usuario.nome}" />
+				</p:column>
+				
+				<p:column style="text-align: center" headerText="Status" width="60" sortBy="#{usuario.status}">
+                    <h:outputText value="#{usuario.status}"/>
+                </p:column>
+
+				<p:column style="text-align: center; width: 100px">
+				
+					<p:button icon="ui-icon-pencil" title="Editar" outcome="/analistas/CadastroAnalista" 
+					rendered="#{seguranca.administrador or seguranca.supervisor}">
+					
+						<f:param name="usuario" value="#{usuario.id}"/>
+						
+					</p:button>
+					
+					<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="PF('confirmacaoExclusao').show()"
+					process="@this" update=":frmPesquisa:confirmacaoExclusaoDialog"
+					rendered="#{seguranca.administrador or seguranca.supervisor}">
+						
+							<f:setPropertyActionListener value="#{usuario}" target="#{pesquisaAnalistaController.usuarioSelecionado}" />
+							
+					</p:commandButton>
+					
+					<p:commandButton icon="ui-icon-circle-zoomout" title="Mostrar equipes" oncomplete="PF('mostrarEquipes').show()" 
+					process="@this" update=":frmPesquisa:mostrarEquipesDialog">
+					
+						<f:setPropertyActionListener value="#{usuario}" target="#{pesquisaAnalistaController.usuarioSelecionado}" />
+					
+					</p:commandButton>
+				
+				</p:column>
+				
+			</p:dataTable>
+			
+			<p:confirmDialog header="Exclusão de analista" message="Tem certeza que deseja excluir o analista #{pesquisaAnalistaController.usuarioSelecionado.nome}?"
+			widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				
+				<p:button value="Não" onclick="PF('confirmacaoExclusao').hide(); return false;"/>
+				<p:commandButton value="Sim" oncomplete="PF('confirmacaoExclusao').hide()" action="#{pesquisaAnalistaController.excluir()}"
+				process="@this" update="analistas-table"/>
+				
+			</p:confirmDialog>
+			
+			<p:dialog width="250" height="150" header="Equipes" widgetVar="mostrarEquipes" id="mostrarEquipesDialog"
+			resizable="false" modal="true" closeOnEscape="true">
+			
+				<p:dataTable id="analista-equipes-table" value="#{pesquisaAnalistaController.usuarioSelecionado.equipes}" var="equipe"
+					style="margin-top: 20px" emptyMessage="Este analista não possui nenhuma equipe." rows="5" paginator="true" 
+					paginatorAlwaysVisible="false" paginatorPosition="bottom">
+				
+					<p:column headerText="Nome das equipes">
+						<h:outputText value="#{equipe.nome}" />
+					</p:column>
+					
+				</p:dataTable>
+			
+			</p:dialog>
+			
+		</h:form>
+	</ui:define>
+	
+</ui:composition>
+
+<h:head></h:head> 
+<body> 
+
+</body> 
+</html>

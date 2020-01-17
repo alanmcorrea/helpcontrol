@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+	<!-- <Resource name="jdbc/helpControlDS" auth="Container"
+          type="javax.sql.DataSource" driverClassName="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/helpcontrol"
+          username="root" password="123456" maxTotal="50" maxIdle="10" maxWaitMillis="-1"/>
+	-->
+	
+	<Resource name="jdbc/helpControlDS" auth="Container"
+          type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost:5432/helpcontrol?autoReconnect=true"
+          username="postgres" password="123456" maxTotal="50" maxIdle="10" maxWaitMillis="-1"/>
+	
+
+</Context>

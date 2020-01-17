@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+	<bean id="appUserDetailsService" class="es.indra.helpcontrol.security.AppUserDetailsService"/>
+
+	<security:http pattern="/javax.faces.resource/**" security="none"/>
+	<security:http pattern="/Login.xhtml" security="none"/>
+	<security:http pattern="/Erro.xhtml" security="none"/>
+<!-- 	<security:http pattern="/AcessoNegado.xhtml" security="none"/> -->
+	
+	<security:http use-expressions="true" auto-config="false">
+	<security:intercept-url pattern="/AcessoNegado.xhtml" access="isAuthenticated()"/>
+	<security:intercept-url pattern="/analistas/PesquisaAnalista.xhtml" access="isAuthenticated()"/>
+	<security:intercept-url pattern="/supervisores/PesquisaSupervisor.xhtml" access="isAuthenticated()"/>
+	<security:intercept-url pattern="/equipes/PesquisaEquipe.xhtml" access="isAuthenticated()"/>
+	<security:intercept-url pattern="/trocarSenha/**" access="isAuthenticated()"/>
+	<security:intercept-url pattern="/chamados/**" access="hasAnyRole('ROLE_ANALISTAS', 'ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/categorias/**" access="hasAnyRole('ROLE_ANALISTAS', 'ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/produtos/**" access="hasAnyRole('ROLE_ANALISTAS', 'ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/procedimentos/**" access="hasAnyRole('ROLE_ANALISTAS', 'ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/regionais/**" access="hasAnyRole('ROLE_ANALISTAS', 'ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/analistas/**" access="hasAnyRole('ROLE_SUPERVISORES', 'ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/administradores/**" access="hasAnyRole('ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/supervisores/**" access="hasRole('ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/equipes/**" access="hasRole('ROLE_ADMINISTRADORES')"/>
+	<security:intercept-url pattern="/**" access="denyAll"/>
+        
+    <security:form-login login-page="/Login.xhtml" login-processing-url="/login" default-target-url="/" 
+        authentication-failure-url="/Login.xhtml?invalid=true" always-use-default-target="true" />
+        
+	<security:logout logout-url="/logout" invalidate-session="true" />
+	
+	<security:access-denied-handler error-page="/AcessoNegado.xhtml"/>
+            
+    <security:csrf disabled="true"/>    
+
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="appUserDetailsService">
+			
+			<security:password-encoder hash="md5"/>
+			
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>
